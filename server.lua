@@ -10,11 +10,19 @@ local function onDoCommand(source, args)
 end
 
 local function onMeCommand(source, args)
+ 
     local text = table.concat(args, " ")
     TriggerClientEvent('3dme:shareDisplay', -1, text, source)
 end
 
--- Register the commands
-RegisterCommand(lang.doCommandName, onDoCommand)
 
-RegisterCommand(lang.meCommandName, onMeCommand)
+
+RegisterCommand(lang.doCommandName, function(source, args)
+ 
+    onDoCommand(source, args)
+end, false)
+
+RegisterCommand(lang.meCommandName, function(source, args)
+ 
+    onMeCommand(source, args)
+end, false)
