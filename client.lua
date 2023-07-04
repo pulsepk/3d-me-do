@@ -25,13 +25,13 @@ local function draw3dText(coords, text)
     ClearDrawOrigin()
 end
 
-local function displayText(ped, text, yOffset)
+local function displayText(ped, text, yOffset, source) 
     local playerPed = PlayerPedId()
     local playerPos = GetEntityCoords(playerPed)
     local targetPos = GetEntityCoords(ped)
     local dist = #(playerPos - targetPos)
     local los = HasEntityClearLosToEntity(playerPed, ped, 17)
-
+    
     if dist <= c.dist and los then
         peds[ped] = {
             time = GetGameTimer() + c.time,
@@ -41,7 +41,15 @@ local function displayText(ped, text, yOffset)
 
         if not peds[ped].exists then
             peds[ped].exists = true
-
+            local playerName = GetPlayerName(GetPlayerFromServerId(source))
+            
+            local messageData = {
+                args = {playerName, text},
+                tags = {"me"},
+                playerId = source, 
+                channel = 'me', 
+            }
+            TriggerEvent('chat:addMessage', messageData)
             Citizen.CreateThread(function()
                 while GetGameTimer() <= peds[ped].time do
                     local pos = GetOffsetFromEntityInWorldCoords(ped, 0.0, 0.0, peds[ped].yOffset)
@@ -55,25 +63,60 @@ local function displayText(ped, text, yOffset)
     end
 end
 
-local function onDoShareDisplay(text, target)
-    local player = GetPlayerFromServerId(target)
-    if player ~= -1 or target == GetPlayerServerId(PlayerId()) then
-        local ped = GetPlayerPed(player)
-        displayText(ped, "~b~* " .. lang.doPrefix .. text .. " ", 0.45)
+local function displayTextdo(ped, text, yOffset, source) 
+    local playerPed = PlayerPedId()
+    local playerPos = GetEntityCoords(playerPed)
+    local targetPos = GetEntityCoords(ped)
+    local dist = #(playerPos - targetPos)
+    local los = HasEntityClearLosToEntity(playerPed, ped, 17)
+    
+    if dist <= c.dist and los then
+        peds[ped] = {
+            time = GetGameTimer() + c.time,
+            text = text,
+            yOffset = yOffset
+        }
+
+        if not peds[ped].exists then
+            peds[ped].exists = true
+            local playerName = GetPlayerName(GetPlayerFromServerId(source))
+            
+            local messageData = {
+                args = {playerName, text},
+                tags = {"do"},
+                playerId = source, 
+                channel = 'do', 
+            }
+            TriggerEvent('chat:addMessage', messageData)
+            Citizen.CreateThread(function()
+                while GetGameTimer() <= peds[ped].time do
+                    local pos = GetOffsetFromEntityInWorldCoords(ped, 0.0, 0.0, peds[ped].yOffset)
+                    draw3dText(pos, peds[ped].text)
+                    Citizen.Wait(0)
+                end
+
+                peds[ped] = nil
+            end)
+        end
     end
 end
 
-local function onMeShareDisplay(text, target)
-    local player = GetPlayerFromServerId(target)
-    if player ~= -1 or target == GetPlayerServerId(PlayerId()) then
-        local ped = GetPlayerPed(player)
-        displayText(ped, "~r~** " .. lang.mePrefix .. text .. " **", 0.7)
-    end
-end
+
 
 -- Register the event
 RegisterNetEvent('3ddo:shareDisplay', onDoShareDisplay)
-RegisterNetEvent('3dme:shareDisplay', onMeShareDisplay)
+AddEventHandler('3ddo:shareDisplay', function(text, source)
+    local player = PlayerId()
+    local ped = GetPlayerPed(player)
+    displayTextdo(ped, "~b~ " .. text .. " ", 0.45, source)
+end)
+
+RegisterNetEvent('3dme:shareDisplay')
+AddEventHandler('3dme:shareDisplay', function(text, source)
+    local player = PlayerId()
+    local ped = GetPlayerPed(player)
+    displayText(ped, "~b~ " .. text .. " ", 0.45, source)
+end)
 
 -- Add the chat suggestion
 TriggerEvent('chat:addSuggestion', '/' .. lang.doCommandName, lang.doCommandDescription, lang.doCommandSuggestion)
