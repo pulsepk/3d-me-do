@@ -104,7 +104,7 @@ end
 
 
 -- Register the event
-RegisterNetEvent('3ddo:shareDisplay', onDoShareDisplay)
+RegisterNetEvent('3ddo:shareDisplay')
 AddEventHandler('3ddo:shareDisplay', function(text, source)
     local player = PlayerId()
     local ped = GetPlayerPed(player)
