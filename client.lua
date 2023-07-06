@@ -1,5 +1,5 @@
     -- edit by n0tst3
-    local Config = Config
+local Config = Config
 local Languages = Languages
 local c, lang = Config, Languages[Config.language]
 
@@ -100,7 +100,6 @@ local function displayTextdo(ped, text, yOffset, source)
         end
     end
 end
-
 
 
 -- Register the event
