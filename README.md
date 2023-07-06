@@ -1,6 +1,6 @@
-CodeM Chat Integrated
+#CodeM Chat Integrated
 
-Instructions:-
+#Instructions:-
 1) Just Drag n Drop into your resources folder
 2) ensure 3d-me-do in server.cfg
 3)restart the server
